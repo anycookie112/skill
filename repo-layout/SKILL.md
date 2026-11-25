@@ -1,6 +1,6 @@
 ---
 name: repo-layout
-description: How the user's repos are laid out - which folders and root files exist and what goes in each. Use when starting a new repo, adding a file or folder, or deciding where a piece of code, config, test, doc or data belongs. Taken from the seedflex repo (Python, FastAPI, LangGraph, uv).
+description: How the user's repos are laid out - which folders and root files exist and what goes in each. Use when starting a new repo, adding a file or folder, or deciding where a piece of code, config, test, doc or data belongs. For Python apps built with FastAPI, LangGraph and uv.
 ---
 
 # Repo layout

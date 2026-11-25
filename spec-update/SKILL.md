@@ -10,8 +10,8 @@ The spec must always say what the code does. Every design change goes into the s
 ## When
 
 1. **A request is not in the spec, or goes against it.** Flag it before writing any code, then stop and wait:
-   > "CSV export is not in the spec. Should I add it to §3.7 API first?"
-   > "This goes against §3.5.1: a name match is never a HIT. Should I change that rule?"
+   > "CSV export is not in the spec. Should I add it to the API section first?"
+   > "This goes against §6: refunds over $500 always go to a person. Should I change that rule?"
 
    If the user says no, do not build it.
 2. **A step is about to be built.** Fill in its module section now (the steps, who does each, why), not earlier.
@@ -25,7 +25,7 @@ The spec must always say what the code does. Every design change goes into the s
 - **Keep the one-line flow true.** If a module's steps change, its flow line changes too.
 - **Remove what is no longer true.** The spec describes the design as it is now; the history goes in the decisions log.
 - **Add a decisions-log line** for every design decision, in the log's existing date format:
-  `| 11-18 | LLM failure in screening → REVIEW, keeping what was found | Before, it crashed the run (500) and lost the totals. |`
+  `| 03-14 | LLM failure in triage → needs_review, keeping what was found | Before, it crashed the request (500) and lost the ticket's details. |`
   The why says what forced it: what was wrong before, or which test or case showed it.
 - **Update the Steps section:** mark the step done, and detail the next one only when it is next.
 - **Show the spec change with the code change**, so the user reviews both together.

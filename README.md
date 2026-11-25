@@ -60,7 +60,7 @@ Explains a spec top-down (goal, flow, module flows, detail on request) with sect
 
 ## Examples
 
-Each snippet below breaks a rule; the one after it is what the rule asks for.
+Each snippet below breaks a rule; the one after it is what the rule asks for. The examples use a made-up support-ticket assistant; the rules apply to any project.
 
 ### Spec: one-line flow per module
 
@@ -69,12 +69,12 @@ Rejected: a module section that starts with paragraphs, so the path through it i
 Instead, open the section with its flow, each step marked with who does it:
 
 ```markdown
-#### Watchlist screening
+#### Ticket triage
 
-`search_watchlist called → ID join (code) → name shortlist (code) → exact name (code), else Jev → outcome (code) → return`
+`triage_ticket called → load ticket (code) → pick category (LLM) → check it is an allowed category (code) → route to a queue (code) → return`
 
-1. ID join over the whole watchlist (code) ...
-2. Name shortlist (code) ...
+1. Load the ticket (code) ...
+2. Pick the category (LLM) ...
 
 **Why it's done this way**
 - ...
@@ -82,27 +82,27 @@ Instead, open the section with its flow, each step marked with who does it:
 
 ### Spec: flag what is not in it
 
-Asked: *"Add a CSV export of the results."* The spec has no export.
+Asked: *"Add a CSV export of the tickets."* The spec has no export.
 
 Rejected: writing the endpoint.
 
-Instead: *"CSV export is not in the spec. Should I add it to the spec (§3.7 API) first?"* The spec and its decisions log are updated, then the code.
+Instead: *"CSV export is not in the spec. Should I add it to the API section first?"* The spec and its decisions log are updated, then the code.
 
 ### No hard-coded matching rules
 
 ```python
-SUFFIXES = ["sdn bhd", "sdn. bhd.", "bhd", "ltd"]
+ABBREVIATIONS = {"st": "street", "rd": "road", "ave": "avenue"}
 
-def same_company(a: str, b: str) -> bool:
-    strip = lambda s: next((s[: -len(x)] for x in SUFFIXES if s.lower().endswith(x)), s)
-    return strip(a).strip().lower() == strip(b).strip().lower()
+def same_address(a: str, b: str) -> bool:
+    expand = lambda s: " ".join(ABBREVIATIONS.get(w, w) for w in s.lower().split())
+    return expand(a) == expand(b)
 ```
 
 Instead, code finds candidates and a model judges them:
 
 ```python
-candidates = process.extract(holder_name, registered_names, scorer=fuzz.WRatio, limit=3)  # ranks, never decides
-# the LLM (or Jev) judges whether each candidate is the same company
+candidates = process.extract(address, known_addresses, scorer=fuzz.WRatio, limit=3)  # ranks, never decides
+# the LLM judges whether any candidate is the same place
 ```
 
 Exact identifier comparisons and arithmetic stay in code.
@@ -123,67 +123,75 @@ llm = get_llm()  # provider and model come from .env (LLM_PROVIDER, LLM_MODEL)
 
 ```python
 @tool
-def search_watchlist(party_ids: list[str]) -> str:
-    results = screener.screen(parties)
-    return json.dumps(results)  # the model sees it, the graph state never does
+def lookup_customer(email: str) -> str:
+    customer = crm.find(email)
+    return customer.model_dump_json()  # the model sees it, the graph state never does
 ```
 
 Instead, return a `Command` with the state change and the message for the model:
 
 ```python
 return Command(update={
-    "watchlist_results": {r.party_id: r.model_dump() for r in results},
-    "messages": [ToolMessage(json.dumps(reply), tool_call_id=tool_call_id)],
+    "customer": customer.model_dump(),
+    "messages": [ToolMessage(customer.model_dump_json(), tool_call_id=tool_call_id)],
 })
 ```
 
 ### Mask ID numbers
 
 ```python
-log.info("Screening %s (ID %s)", person["full_name"], person["id_number"])
+log.info("Refund for %s, card %s", customer.name, customer.card_number)
 ```
 
 Instead:
 
 ```python
-log.info("Screening %s (ID %s)", person["full_name"], mask_id(person["id_number"]))  # ****5642
+log.info("Refund for %s, card %s", customer.name, mask_id(customer.card_number))  # ************4242
 ```
 
 ### Validate where data enters
 
 ```python
-def extract_fields(raw: Any) -> dict:
-    if isinstance(raw, dict) and "closing_balance" in raw:
+def create_refund(payload: Any) -> dict:
+    if isinstance(payload, dict) and "amount" in payload:
         ...
 ```
 
 Instead, parse once at the boundary and pass the model on:
 
 ```python
-fields = llm.with_structured_output(StatementFields).invoke(prompt)  # a Pydantic model from here on
+class RefundRequest(BaseModel):
+    order_id: str
+    amount: Decimal
+
+@app.post("/refunds")
+def create_refund(request: RefundRequest) -> Refund:  # FastAPI validates it; a typed model from here on
+    ...
+
+category = llm.with_structured_output(TicketCategory).invoke(prompt)  # the same for LLM output
 ```
 
 ### Every type override says why
 
 ```python
-company = cast(Company, record)
+order = cast(Order, row)
 ```
 
 Instead:
 
 ```python
-# Safe: get_company only returns records it read from companies.json, which all have these fields.
-company = cast(Company, record)
+# Safe: the orders query selects every Order column, so each row has all the fields.
+order = cast(Order, row)
 ```
 
 ### No business logic in `main.py`
 
 ```python
-@app.post("/runs")
-async def create_run(file: UploadFile):
-    data = await file.read()
-    with zipfile.ZipFile(io.BytesIO(data)) as z:  # unzipping and checking files inside the route
-        ...
+@app.post("/tickets")
+async def create_ticket(ticket: NewTicket):
+    category = llm.invoke(f"Classify: {ticket.body}").content  # the LLM call and the routing inside the route
+    queue = "billing" if "refund" in category.lower() else "general"
+    ...
 ```
 
-Instead, the route calls the pipeline, and the processing lives in `utils/` and `graph/`.
+Instead, the route calls the pipeline, and the processing lives in `utils/`, `graph/` and `agent/`.

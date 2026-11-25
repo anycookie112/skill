@@ -23,7 +23,7 @@ For a feature in a repo that already has a spec, do not start a new one: use `sp
 ## Writing rules
 
 - **Plain and short.** The surface view fits on about one page.
-- **Mark who does each step:** (code), (LLM), (Jev), (user). Certain decisions are code; judgements are the LLM's.
+- **Mark who does each step:** (code), (LLM), (user), or the name of any other model or service that decides. Certain decisions are code; judgements are the LLM's.
 - **Do not invent.** Anything unknown goes in Open questions, not in the design.
 - **Do not overplan.** No function signatures, field lists or edge cases for steps that are not next.
 
@@ -79,19 +79,19 @@ Add these sections only when the project needs them: API (endpoints, requests, r
 
 ## Example module section
 
-From the seedflex spec, once its step was built:
+A made-up support-ticket assistant, once its step was built:
 
 ```markdown
-#### Watchlist screening
+#### Ticket triage
 
-`search_watchlist called → ID join (code) → name shortlist (code) → exact name (code), else Jev → outcome (code) → return`
+`triage_ticket called → load ticket (code) → pick category (LLM) → check it is an allowed category (code) → route to a queue (code) → return`
 
-1. **ID join over the whole watchlist (code).** An entry with the same ID number is a hit.
-2. **Name shortlist (code).** Entries whose name scores at least 65 (rapidfuzz); the score only picks what gets checked.
-3. **Same name?** Exact (code), otherwise Jev judges it (probability ≥ 0.7).
-4. **Outcome (code):** hit / review / ruled out / no match.
+1. **Load the ticket (code).** Subject, body and the customer's plan.
+2. **Pick the category (LLM).** Structured output: one of the allowed categories, with a one-line reason.
+3. **Check (code).** A category outside the allowed list → `needs_review`; never guessed.
+4. **Route (code).** Queue by category; a customer on the enterprise plan → the priority queue.
 
 **Why it's done this way**
-- The ID join runs over the whole watchlist, so a listed party using another name is still caught.
-- A name match is never a hit: the same name could be two people.
+- The LLM judges the wording; the routing is code, so it can change without touching the prompt.
+- An unknown category goes to review rather than a default queue, so mistakes are seen.
 ```
