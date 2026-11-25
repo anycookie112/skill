@@ -43,6 +43,7 @@ Every repo follows this layout. Put new code where its kind already lives; if no
   tests/
     conftest.py            shared fixtures
     test_<behaviour>.py    one file per behaviour being tested (test_login.py, test_verdict.py)
+    logs/                  run logs of AI workflow tests, one per test (git-ignored; see the testing skill)
 
   evals/
     run_eval.py            runs the eval cases through the real app and scores them
@@ -59,7 +60,7 @@ Every repo follows this layout. Put new code where its kind already lives; if no
 - **Business logic** goes in `utils/`, `graph/` and `agent/`, never in `main.py`.
 - **Data that isn't part of the project** (provided data packs, briefs, drafts) stays out of git through `.gitignore`. The code reaches it through a path in `.env`.
 - **Docs live at the root** as `UPPERCASE.md`. Do not start a `docs/` folder unless asked.
-- **Generated or local files** are git-ignored: `.venv`, `__pycache__/`, `logs/`, `*.db`, `.env`.
+- **Generated or local files** are git-ignored: `.venv`, `__pycache__/`, `logs/`, `tests/logs/`, `*.db`, `.env`.
 
 ## Linter (Ruff)
 

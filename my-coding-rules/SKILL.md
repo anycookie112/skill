@@ -20,6 +20,7 @@ Follow these for every change in the user's projects.
 - **Each file starts with a docstring** saying what it is for; where a file reads `.env` variables, the docstring lists them.
 - **Validate data where it enters, then trust the types.** Anything from outside (API requests, LLM output, files) is parsed once at the boundary into a typed model: Pydantic, or a `TypedDict` for graph state. No `Any` in function signatures, no `dict[str, Any]` or bare `dict` for data with known fields (give it a model), and no `isinstance` checks scattered through the logic.
 - **Every type override says why.** Each `cast(...)` and `# type: ignore[<code>]` has a comment right above it saying why it is safe.
+- **Tests follow the `testing` skill:** a test that runs an AI workflow writes a run log of the flow and every LLM and tool call.
 - **Run the linter before saying a change is done.** `uv run ruff check` must pass (settings in `pyproject.toml`, see `repo-layout`). Fix the code. Silence a rule only where it truly does not fit (for example a logger that records values of any type), with `# noqa: <code>` and the reason on the same line: `# noqa: ANN401 - logs whatever LangChain passes`.
 
 ## Agents and LangChain / LangGraph

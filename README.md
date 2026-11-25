@@ -12,7 +12,7 @@ Clone the repo as your Claude Code skills folder (only when `~/.claude/skills` d
 git clone https://github.com/anycookie112/skill ~/.claude/skills
 ```
 
-If you already have a skills folder, clone the repo somewhere else and copy the skill folders (`my-coding-rules/`, `repo-layout/`, `spec-write/`, `spec-update/`, `spec-understand/`, `spec-gap/`) into `~/.claude/skills/`.
+If you already have a skills folder, clone the repo somewhere else and copy the skill folders (`my-coding-rules/`, `repo-layout/`, `spec-write/`, `spec-update/`, `spec-understand/`, `spec-gap/`, `testing/`) into `~/.claude/skills/`.
 
 ### Make it always on
 
@@ -45,6 +45,10 @@ git pull
 ### `repo-layout`: where it goes
 
 The folder tree every repo follows (root docs, `src/frontend`, `src/backend` with `graph/`, `agent/`, `agent/tools/`, `utils/`, then `tests/`, `evals/`, `logs/`) and where secrets, tunable values, per-machine settings, business logic, external data and docs belong. Also the standard Ruff settings that check some of the rules automatically.
+
+### `testing`: what tests output
+
+Every test that runs an AI workflow writes a run log to `tests/logs/<test>.jsonl`: each graph node, LLM call and tool call with its input, output and time, written by the app's own run-log handler. A failing test is read from its log.
 
 ### `spec-write`: start a spec
 
