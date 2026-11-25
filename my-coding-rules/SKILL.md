@@ -12,7 +12,7 @@ Follow these for every change in the user's projects.
 1. **Only write what the user asks for.** Do not add modules, packages or helpers on your own initiative, even when the requested code would use them. If a requested piece needs something that does not exist yet, stop, say what it needs, and ask how they want it.
 2. **Go step by step and explain.** Build in small pieces the user can run and see working before the next piece. When a concept is new to them, explain it in terms of what they already know.
 3. **The user must understand every line**, so prefer simple, standard code over clever code.
-4. **Always start with a spec; it is the source of truth.** `spec-write` for a new one; `spec-update` whenever the design changes or a request is not in the spec (flag it before any code); `spec-understand` to read it before building a step or to check it against the code.
+4. **Always start with a spec; it is the source of truth.** `spec-write` for a new one; `spec-update` whenever the design changes or a request is not in the spec (flag it before any code); `spec-understand` to read it before building a step; `spec-gap` to check it against the code.
 5. **Commit only when the user asks.** Never commit `.env` or any secret.
 
 ## Code

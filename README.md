@@ -12,7 +12,7 @@ Clone the repo as your Claude Code skills folder (only when `~/.claude/skills` d
 git clone https://github.com/anycookie112/skill ~/.claude/skills
 ```
 
-If you already have a skills folder, clone the repo somewhere else and copy the skill folders (`my-coding-rules/`, `repo-layout/`, `spec-write/`, `spec-update/`, `spec-understand/`) into `~/.claude/skills/`.
+If you already have a skills folder, clone the repo somewhere else and copy the skill folders (`my-coding-rules/`, `repo-layout/`, `spec-write/`, `spec-update/`, `spec-understand/`, `spec-gap/`) into `~/.claude/skills/`.
 
 ### Make it always on
 
@@ -36,7 +36,7 @@ git pull
 ### `my-coding-rules`: what to do
 
 - **How to work:** only write what is asked; build in small runnable steps; simple code I can understand line by line; commit only when asked, never `.env`.
-- **Spec first:** every project starts with a spec, and the spec is the source of truth, through the three `spec-` skills below.
+- **Spec first:** every project starts with a spec, and the spec is the source of truth, through the four `spec-` skills below.
 - **Code:** every file starts with a docstring, listing the `.env` variables it reads. Data from outside is validated once where it enters, into typed models; no `Any` and no loose dicts after that. Every `cast` or `# type: ignore` says why it is safe. `ruff check` passes before a change is done; a rule is silenced only with the reason on the same line.
 - **Agents and LangChain / LangGraph:** one main `Agent` class to inherit from; library built-ins over hand-written loops; tools update the graph state with `Command`; the LLM provider is switched through `.env`.
 - **No hard-coded matching rules:** no keyword lists or name-variant tables. Tools return candidates, the LLM judges the ambiguous cases, and code decides only exact identifiers and arithmetic.
@@ -54,9 +54,13 @@ Writes `SPEC.md` for a new project: surface view first (goal, out of scope, stac
 
 Flags any request that is not in the spec before code is written. Fills in a module's detail when its step comes up, changes only the section that changed, and adds a decisions-log line, in the same change as the code.
 
-### `spec-understand`: read and check it
+### `spec-understand`: read it
 
-Explains a spec top-down (goal, flow, module flows, detail on request) with section and `file:line` references. Checks the spec against the code and reports the gaps as a table without fixing them.
+Explains a spec top-down (goal, flow, module flows, detail on request) and answers "how does X work" with section and `file:line` references.
+
+### `spec-gap`: check it against the code
+
+Finds where the spec and the code disagree: uncovered code, stale sections, missing flows, different numbers or steps, promises the code can break, unrecorded decisions. Reports them ranked by harm, each marked "fix in spec", "fix in code" or "decide". Also lists what the spec describes but is not built yet, as a to-do list. Fixes nothing.
 
 ## Examples
 
