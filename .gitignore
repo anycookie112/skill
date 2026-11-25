@@ -1,0 +1,5 @@
+# Only the folders listed here are published; everything else in ~/.claude/skills stays local.
+/*
+!/.gitignore
+!/my-coding-rules/
+!/repo-layout/
