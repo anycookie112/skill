@@ -1,5 +1,9 @@
 # Only the folders listed here are published; everything else in ~/.claude/skills stays local.
 /*
 !/.gitignore
+!/README.md
 !/my-coding-rules/
 !/repo-layout/
+!/spec-write/
+!/spec-update/
+!/spec-understand/

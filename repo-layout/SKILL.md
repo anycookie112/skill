@@ -15,7 +15,7 @@ Every repo follows this layout. Put new code where its kind already lives; if no
   SPEC.md                  the spec: source of truth for the design, with a decisions log
   EVALS.md                 how the app is evaluated and the latest results (LLM apps)
   AI_USAGE.md              how AI tools were used to build it (when asked for)
-  pyproject.toml           project, dependencies, scripts, pytest settings (uv)
+  pyproject.toml           project, dependencies, scripts, pytest and ruff settings (uv)
   uv.lock                  locked versions (uv writes it; commit it)
   requirements.txt         exported from uv, for tools that need pip
   .python-version
@@ -60,3 +60,19 @@ Every repo follows this layout. Put new code where its kind already lives; if no
 - **Data that isn't part of the project** (provided data packs, briefs, drafts) stays out of git through `.gitignore`. The code reaches it through a path in `.env`.
 - **Docs live at the root** as `UPPERCASE.md`. Do not start a `docs/` folder unless asked.
 - **Generated or local files** are git-ignored: `.venv`, `__pycache__/`, `logs/`, `*.db`, `.env`.
+
+## Linter (Ruff)
+
+Every repo has Ruff as a dev dependency (`uv add --dev ruff`) and this in `pyproject.toml`:
+
+```toml
+[tool.ruff.lint]
+extend-select = [
+    "D100",    # every module starts with a docstring
+    "D104",    # every package (__init__.py) starts with a docstring
+    "ANN401",  # no Any in function arguments or return types
+    "PGH003",  # a "# type: ignore" must name the error it ignores
+]
+```
+
+Run it with `uv run ruff check`.

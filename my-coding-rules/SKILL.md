@@ -12,18 +12,15 @@ Follow these for every change in the user's projects.
 1. **Only write what the user asks for.** Do not add modules, packages or helpers on your own initiative, even when the requested code would use them. If a requested piece needs something that does not exist yet, stop, say what it needs, and ask how they want it.
 2. **Go step by step and explain.** Build in small pieces the user can run and see working before the next piece. When a concept is new to them, explain it in terms of what they already know.
 3. **The user must understand every line**, so prefer simple, standard code over clever code.
-4. **Always start with a spec; it is the source of truth.**
-   - **Surface view first:** a top-down overview of what it does, the main parts, the stack (frameworks, LLM provider, storage) and the flow between parts. **Never overplan:** detail is written only for the step about to be built.
-   - **Each module gets its own section** (a tool, a graph node, a processing class), starting with its flow in one line, each step marked with who does it (code, LLM, Jev, ...):
-     `search_watchlist called → ID join (code) → name shortlist (code) → exact name (code), else Jev → outcome (code) → return`
-     Then the steps in order, then "Why it's done this way".
-   - **Flag anything that is not in the spec.** If a request is not covered by the spec, or goes against it, say so before writing any code: name what is new or what it conflicts with, and ask whether to add it to the spec first. Do not build it silently.
-   - **Read the spec before building a step.** When the design changes, update the spec in the same change and add a line to its decisions log (date | decision | why).
+4. **Always start with a spec; it is the source of truth.** `spec-write` for a new one; `spec-update` whenever the design changes or a request is not in the spec (flag it before any code); `spec-understand` to read it before building a step or to check it against the code.
 5. **Commit only when the user asks.** Never commit `.env` or any secret.
 
 ## Code
 
 - **Each file starts with a docstring** saying what it is for; where a file reads `.env` variables, the docstring lists them.
+- **Validate data where it enters, then trust the types.** Anything from outside (API requests, LLM output, files) is parsed once at the boundary into a typed model: Pydantic, or a `TypedDict` for graph state. No `Any` in function signatures, no `dict[str, Any]` or bare `dict` for data with known fields (give it a model), and no `isinstance` checks scattered through the logic.
+- **Every type override says why.** Each `cast(...)` and `# type: ignore[<code>]` has a comment right above it saying why it is safe.
+- **Run the linter before saying a change is done.** `uv run ruff check` must pass (settings in `pyproject.toml`, see `repo-layout`). Fix the code. Silence a rule only where it truly does not fit (for example a logger that records values of any type), with `# noqa: <code>` and the reason on the same line: `# noqa: ANN401 - logs whatever LangChain passes`.
 
 ## Agents and LangChain / LangGraph
 
